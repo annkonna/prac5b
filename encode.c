@@ -50,14 +50,35 @@ void dump_mem(const void *mem , size_t len) {
  */
 int encode_text(void *encode, char *text) {
     /* Your implementation should appear here */
-    
+    void *dataint = encode;
+    int count = 0;
+    while(*text != '\0'){
+        encode = encode + sizeof(int);
+        while (*text != '\n' && *text != '\0'){
+            *(char *)encode++ = *text++;
+            count = count + 1;
+        }
+        
+        if(*text == '\n'){
+            count = count + 1;
+            *(int *)dataint = count;
+            dataint = dataint + sizeof(int) + count;
+            count = 0;
+            *(char *)encode++ = *text++;
+        } else { // \0
+            *(int *)dataint = count;
+            break;
+        }
+    }
+
+    *(int *)encode = 0;
     return 0;
 }
 
 int main(int argc, char *argv[]) {
 
-    void *text = malloc(MAX_TEXT_SIZE);
-    void *encode = malloc(MAX_ENCODE_SIZE);
+    void *text = calloc(MAX_TEXT_SIZE, 1);
+    void *encode = calloc(MAX_ENCODE_SIZE, 1);
 
     int c;
     char *temp = (char *)text;
